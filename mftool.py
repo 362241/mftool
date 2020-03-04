@@ -27,6 +27,8 @@ import json
 from bs4 import BeautifulSoup
 import datetime
 from datetime import date,timedelta
+# Putting this to supress a warning caused by setting verify SSL to false
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 class Mftool():
     """
@@ -120,7 +122,10 @@ class Mftool():
         if self.is_valid_code(code):
             scheme_info = {}
             url = self._get_scheme_url+code
-            response = self._session.get(url).json()
+             # Putting this to suppress warning when SSL verification is turned off
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            # Putting verify = False in order to work around weird SSL verification issue
+            response = self._session.get(url, verify = False).json()
             scheme_data = response['meta']
             scheme_info['fund_house'] = scheme_data['fund_house']
             scheme_info['scheme_type'] = scheme_data['scheme_type']
